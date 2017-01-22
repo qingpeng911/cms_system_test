@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tjpcms.spring.mapper.EntMapper">
+  
+	<select id="getLmTree" resultType="map">
+		select t.id,t.pId,t.nav,s.zdxpy lxpy,'true' open,t.donly2,t.donly3,t.url lj,
+		<if test="showid==1"> CONCAT(t.name,' (',CAST(t.id AS CHAR),')') name </if>
+		<if test="showid!=1"> t.name </if>
+		from tjpcms_lanmu t left join tjpcms_zdx s on t.lx=s.zdxmc left join tjpcms_zdb d on s.pid=d.id
+		where d.py='lanmuleixing'
+		order by t.px,t.gx desc
+	</select>
+
+	<select id="usrGetLm" resultType="map">
+		select t.id,t.pId,t.nav,s.zdxpy lxpy,'true' open, t.name
+		from tjpcms_lanmu t left join tjpcms_zdx s on t.lx=s.zdxmc left join tjpcms_zdb d on s.pid=d.id
+		where d.py='lanmuleixing' and  (t.id in (7,96,97,6,94,95,114,111,112,114) or (t.id>=119 and t.id&lt;=127))
+		order by t.px,t.gx desc
+	</select>
+
+	<select id="getTblZiduan" resultType="java.util.Map">
+		SELECT COLUMN_NAME,extra,data_type,CHARACTER_MAXIMUM_LENGTH FROM information_schema.COLUMNS where TABLE_SCHEMA=#{1} and TABLE_NAME=#{0}
+	</select>
+	
+	<select id="getLmList" resultType="map">
+		SELECT t.*,(select count(*) from tjpcms_lanmu s where s.pid=t.id)cnt,s.zdxmc,s.zdxpy lxpy
+		from tjpcms_lanmu t left join tjpcms_zdx s on t.lx=s.zdxmc left join tjpcms_zdb d on s.pid=d.id
+		where t.pid=#{0} and d.py='lanmuleixing'
+		order by t.px,t.id limit #{1},#{2}
+	</select>
+	
+	<select id="cntLmList" resultType="int">
+		SELECT count(*) from tjpcms_lanmu where pid=#{0}
+	</select>
+
+
+	<insert id="ins"  parameterType="map" useGeneratedKeys="true"  keyProperty="id">
+		${sql}
+	</insert>
+	<insert id="add"  parameterType="java.lang.String">
+		${sql}
+	</insert>
+	<delete id="del"  parameterType="java.lang.String">
+		${sql}
+	</delete>
+	<update id="upd"  parameterType="java.lang.String">
+		${sql}
+	</update>
+	<select id="r" resultType="map" parameterType="java.lang.String" >
+		${sql}
+	</select>
+	<select id="ro" resultType="map" parameterType="java.lang.String" >
+		${sql}
+	</select>
+	<select id="cnt" resultType="int" parameterType="java.lang.String">
+		${sql}
+	</select>
+	<select id="vpx" resultType="int" parameterType="java.lang.String">
+		${sql}
+	</select>
+	<select id="obj" resultType="map" parameterType="java.lang.String">
+		${sql}
+	</select>
+
+	
+	
+	<select id="getnav" resultType="java.util.Map" parameterType="java.lang.String">
+		SELECT * from tjpcms_lanmu  where pID=1 and nav='显示'   order by px ,gx desc
+	</select>
+	<select id="getzlmlist" resultType="java.util.Map" parameterType="Object">
+		SELECT * from tjpcms_lanmu  where pID=#{0} and nav='显示'     order by px ,gx desc
+	</select>
+	<select id="getzclist" resultType="java.util.Map" parameterType="java.lang.String">
+		SELECT * from tjpcms_lanmu  where pID=4 and nav='显示' 
+	</select>
+	
+	<select id="getzxzclist" resultType="java.util.Map" parameterType="Object">
+		SELECT * from tjpcms_sczc  where 1=1 and delf=0 order by cid, gx desc
+	</select>	
+	
+	<select id="gettopzclist" resultType="java.util.Map" parameterType="Object">
+		SELECT * FROM tjpcms_sczc WHERE id IN(select max(id) from tjpcms_sczc  where delf=0 GROUP BY cid);
+	</select>
+	
+	<select id="getyqlj" resultType="java.util.Map" parameterType="Object">
+		SELECT * from tjpcms_yqlj  where 1=1 order by id desc
+	</select>	
+	<select id="getfzgj1" resultType="java.util.Map" parameterType="Object">
+		SELECT * FROM tjpcms_fzgj WHERE cid=94 
+	</select>	
+	<select id="getfzgj2" resultType="java.util.Map" parameterType="Object">
+		SELECT * FROM tjpcms_cxcyhd WHERE cid=95 and delf=0 and shzt='审核通过' order by px desc
+	</select>	
+	<select id="getbqqy" resultType="java.util.Map" parameterType="Object">
+		SELECT * FROM tjpcms_bqqy WHERE cid=111 and shzt='审核通过' and syxs='是' and sypx is not null order by sypx desc
+	</select>
+	<select id="cntbqqy" resultType="java.lang.Integer" parameterType="Object">
+		SELECT count(*) FROM tjpcms_bqqy WHERE cid=111  and shzt='审核通过'  and syxs='是' and sypx is not null  
+	</select>
+    <select id="getbqqylist" resultType="java.util.Map" parameterType="Object">
+		SELECT * FROM tjpcms_bqqy WHERE cid=111   and shzt='审核通过' and syxs='是' and sypx is not null  order by sypx desc  limit #{s},#{e}
+	</select>
+	<select id="gettscp" resultType="java.util.Map" parameterType="Object">
+		SELECT * FROM tjpcms_tscp WHERE cid=112 and shzt='审核通过' order by px desc,gx desc
+	</select>	
+	<select id="getxqlist" resultType="java.util.Map" parameterType="String">
+		SELECT t.*,(gx>=#{0})hot FROM tjpcms_xqhd  t WHERE cid=96 and delf=0 and shzt='审核通过' order by gx desc,px desc
+	</select>	
+	<select id="getcplist" resultType="java.util.Map" parameterType="String">
+		SELECT t.*,(gx>=#{0})hot FROM tjpcms_xqhd t WHERE cid=97  and delf=0 and shzt='审核通过' order  by px desc,gx desc
+	</select>	
+	<select id="getbanner" resultType="java.util.Map" parameterType="Object">
+		SELECT * FROM tjpcms_banner WHERE 1=1 order by px desc
+	</select>	
+	<select id="getgundongtu" resultType="java.util.Map" parameterType="Object">
+		SELECT * FROM tjpcms_xwzx WHERE cid=100 order by id desc
+	</select>	
+
+	<select id="getyjhgk" resultType="java.util.Map" parameterType="Object">
+		SELECT * FROM tjpcms_fwb WHERE cid=3 
+	</select>
+	<select id="cntZthd" resultType="int" parameterType="Object">
+		SELECT COUNT(*) FROM tjpcms_xwzx WHERE cid=5  and delf=0 
+	</select>
+	<select id="getzthd" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT * FROM tjpcms_xwzx WHERE cid=5 and delf=0 order by px desc  limit #{s},#{e}
+	</select>
+	<select id="getdetail" resultType="java.util.Map" parameterType="Object">
+		SELECT * from tjpcms_sczc  where ID=#{0}   
+	</select>
+	<select id="getxwzxdetail" resultType="java.util.Map" parameterType="Object">
+		SELECT * from tjpcms_xwzx  where ID=#{0}   and delf=0
+	</select>
+	<select id="getkjfwcpdetail" resultType="java.util.Map" parameterType="Object">
+		SELECT * from tjpcms_kjfwcp  where ID=#{0}   
+	</select>	
+	<select id="getxqhddetail" resultType="java.util.Map" parameterType="Object">
+		SELECT * from tjpcms_xqhd  where ID=#{0}   
+	</select>
+	<select id="getbqqydetail" resultType="java.util.Map" parameterType="Object">
+		SELECT * from tjpcms_bqqy  where ID=#{0}   and cid=111 and shzt='审核通过'
+	</select>	
+	<select id="gettscpdetail" resultType="java.util.Map" parameterType="Object">
+		SELECT * from tjpcms_tscp  where ID=#{0} and cid=112  and shzt='审核通过'
+	</select>		
+	<select id="getcxcydetail" resultType="java.util.Map" parameterType="Object">
+		SELECT * from tjpcms_cxcyhd  where ID=#{0}   and cid=95 and delf=0 and shzt='审核通过'
+	</select>	
+	<select id="getlxwm" resultType="java.util.Map" parameterType="Object">
+		SELECT * FROM tjpcms_fwb WHERE cid=110 
+	</select>	
+	<select id="getzc" resultType="java.util.Map">
+		SELECT * FROM tjpcms_fwb WHERE cid=131
+	</select>	
+	<select id="cntsczc" resultType="java.lang.Integer" parameterType="int">
+		SELECT count(*) FROM  tjpcms_sczc t left join tjpcms_lanmu s on s.id=t.cid where 1=1 
+   <if test="jb!=null and jb!= '' and jb !='全部'">
+        and (t.jb =#{jb})
+   </if> 
+   	<if test="idx!=null and idx!= '' and idx !='全部' ">
+        and (s.name = '${idx}')
+   </if> 
+    <if test="title!=null and title!= '' ">
+        and (t.title like '%${title}%')
+   </if>    
+	</select>		
+	
+  <select id="getSczcByPara" resultType="java.util.Map" parameterType="java.util.Map">
+  	select t.*,s.name  from  tjpcms_sczc t left join tjpcms_lanmu s on s.id=t.cid where 1=1  AND delf=0
+   <if test="jb!=null and jb!= '' and jb !='全部'">
+        and (t.jb =#{jb})
+   </if> 
+   	<if test="idx!=null and idx!= '' and idx !='全部' ">
+        and (s.name = '${idx}')
+   </if> 
+    <if test="title!=null and title!= '' ">
+        and (t.title like '%${title}%')
+   </if>    
+     order by px desc, gx desc
+      limit #{s},#{e}
+  </select><!--		
+  
+   <select id="getlmByPara" resultType="java.util.Map" parameterType="java.lang.String">
+  	select id  from  tjpcms_lanmu  where 1=1
+   	<if test="name!=null and name!= '' ">
+        and (name like '%${name}%')
+   </if> 
+  </select>	
+  
+  
+   --><select id="getkjfwcpByPara" resultType="java.util.Map" parameterType="java.util.Map">
+  	select * from  tjpcms_fzgj  where cid=94 
+	<if test="jb!=null and jb!= '' and jb !='全部'">
+        and (jb like '%${jb}%')
+   </if> 
+    <if test="title!=null and title!= '' ">
+        and (title like '%${title}%')
+   </if> 
+   order by rq desc
+    limit #{s},#{e}
+  </select>  
+	<select id="getCplist" resultType="map" parameterType="map">
+  	select * from  tjpcms_kjfwcp  where 1=1 and shzt='审核通过' and delf=0
+	<if test="cid!=null and cid!= '' and cid!='全部'">
+        and (cid = #{cid})
+   </if>
+    <if test="gjc!=null and gjc!= '' ">
+        and (gjc like '%${gjc}%')
+   </if> 
+    <if test="cpmc!=null and cpmc!= '' ">
+        and (cpmc like '%${cpmc}%')
+   </if> 
+   order by px desc,gx desc limit #{s},#{e}
+  </select> 
+	<select id="cntfzgj" resultType="java.lang.Integer" parameterType="java.util.Map">
+  	select count(*) from  tjpcms_kjfwcp  where 1=1 and shzt='审核通过' and delf=0
+	<if test="cid!=null and cid!= '' and cid!='全部'">
+        and (cid = #{cid})
+   </if>
+    <if test="gjc!=null and gjc!= '' ">
+        and (gjc like '%${gjc}%')
+   </if> 
+    <if test="cpmc!=null and cpmc!= '' ">
+        and (cpmc like '%${cpmc}%')
+   </if> 
+  </select> 
+  
+  
+  	<select id="getxwzx" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT * FROM tjpcms_xwzx WHERE cid=77  and delf=0  order by rq desc
+    limit #{s},#{e}
+	</select>
+	<select id="cntxwzx" resultType="java.lang.Integer" parameterType="int">
+		SELECT count(*) FROM tjpcms_xwzx WHERE cid=77 
+	</select>	
+  	<select id="gettscpByPara" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT * FROM tjpcms_tscp WHERE cid=112  and shzt='审核通过' order by px desc,gx desc
+    limit #{s},#{e}
+	</select>
+	<select id="cnttscp" resultType="java.lang.Integer" parameterType="int">
+		SELECT count(*) from tjpcms_tscp WHERE cid=112  and shzt='审核通过'
+	</select>	
+  	<select id="getcxcyhdByPara" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT * FROM tjpcms_cxcyhd WHERE cid=95 and shzt='审核通过' and delf=0 order by px desc,gx desc
+    limit #{s},#{e}
+	</select>
+	<select id="cntcxcyhd" resultType="java.lang.Integer" parameterType="int">
+		SELECT count(*) from tjpcms_cxcyhd WHERE cid=95 and shzt='审核通过' and delf=0
+	</select>	
+	  	<select id="getxq" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT * FROM tjpcms_xqhd WHERE cid=96     order by rq desc
+    limit #{s},#{e}
+	</select>
+	<select id="cntxq" resultType="java.lang.Integer" parameterType="int">
+		SELECT count(*) FROM tjpcms_xqhd WHERE cid=96  and delf=0 and shzt='审核通过'
+	</select>	
+	<select id="gettg" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT * FROM tjpcms_xqhd WHERE cid=97     order by rq desc
+    limit #{s},#{e}
+	</select>
+	<select id="cnttg" resultType="java.lang.Integer" parameterType="int">
+		SELECT count(*) FROM tjpcms_xqhd WHERE cid=97  and delf=0 and shzt='审核通过'
+	</select>	
+
+
+	<select id="addjddj" resultType="java.util.Map" parameterType="java.util.Map">
+		INSERT INTO tjpcms_jddj (id,pid,title,nr,rq,gx,px) values (#{id},#{pid},#{title},#{nr},#{rq} ,#{gx} ,#{px})
+	</select>	
+  
+	<select id="countUser" parameterType="map" resultType="int">
+		select count(*) from t_user where yhm=#{yhm}
+	</select>
+	
+	<insert id="insertUser" parameterType="map" >
+    insert into t_user( cid,yhm,mm,xm,gx,zt) values
+    (113,#{yhm,jdbcType=VARCHAR},#{mm,jdbcType=VARCHAR},#{xm,jdbcType=VARCHAR},#{gx,jdbcType=VARCHAR},"正常")
+  </insert>	
+  
+    <select id="cntUserByYhmMm" resultType="java.lang.Integer" parameterType="java.lang.String">
+  	select count(*) from t_user where yhm=#{0} and mm=#{1} and zt='正常'
+  </select>
+  
+  <select id="getUserByYhm"  parameterType="java.lang.String">
+  	select * from t_user where yhm=#{0}
+  </select>
+  
+    <select id="getUserId"  parameterType="java.lang.String" resultType="java.lang.Integer">
+  	select id from t_user where yhm=#{0}
+  </select>
+  
+  	<insert id="insertHy" parameterType="map" >
+    insert into tjpcms_sqrh( cid,uid,mc,sm,lxfs,gx) values
+    (#{cid},#{uid},#{mc,jdbcType=VARCHAR},#{sm,jdbcType=VARCHAR},#{lxfs,jdbcType=VARCHAR},#{gx,jdbcType=VARCHAR})
+  </insert>	
+  
+  	<select id="countHy" parameterType="java.lang.Integer" resultType="int">
+		select count(*) from tjpcms_sqrh where uid=#{uid}
+	</select>
+	
+	<select id="getkjfwcp" resultType="java.util.Map" parameterType="Object">
+		SELECT * FROM tjpcms_kjfwcp a WHERE a.delf=0
+		and 5>=(SELECT COUNT(*) FROM tjpcms_kjfwcp b WHERE a.cid=b.cid AND b.gx>a.gx  and delf=0 )
+		order by a.cid,a.px desc,a.gx desc
+	</select>	
+	
+  	<insert id="insertsqrh_gr" parameterType="map" >
+    insert into tjpcms_sqrh_gr( cid,yhm,xm,xb,csny,jg,mz,dp,zp,sfzh,byyx,sxzy,xl,xw,cszy,lxdh,yx,sj,gzdw,zczw,lxdz,yzbm,ywzc,jl,tjr,tjyj,xhyj,bz,gx) values
+    (#{cid},#{yhm,jdbcType=VARCHAR},#{xm,jdbcType=VARCHAR},#{xb,jdbcType=VARCHAR},#{csny,jdbcType=VARCHAR},#{jg,jdbcType=VARCHAR},#{mz,jdbcType=VARCHAR},#{dp,jdbcType=VARCHAR}
+    ,#{zp,jdbcType=VARCHAR},#{sfzh,jdbcType=VARCHAR},#{byyx,jdbcType=VARCHAR},#{sxzy,jdbcType=VARCHAR},#{xl,jdbcType=VARCHAR},#{xw,jdbcType=VARCHAR},#{cszy,jdbcType=VARCHAR}
+    ,#{lxdh,jdbcType=VARCHAR},#{yx,jdbcType=VARCHAR},#{sj,jdbcType=VARCHAR},#{gzdw,jdbcType=VARCHAR},#{zczw,jdbcType=VARCHAR},#{lxdz,jdbcType=VARCHAR},#{yzbm,jdbcType=VARCHAR}
+    ,#{ywzc,jdbcType=VARCHAR},#{jl,jdbcType=VARCHAR},#{tjr,jdbcType=VARCHAR},#{tjyj,jdbcType=VARCHAR},#{xhyj,jdbcType=VARCHAR},#{bz,jdbcType=VARCHAR},#{gx,jdbcType=VARCHAR})
+  </insert>	
+  
+  <insert id="insertsqrh_dw" parameterType="map" >
+  insert into tjpcms_sqrh_dw(cid,yhm,dwmc,frdb,zcsj,zczj,lxdz,yzbm,lxr,lxdh,sj,yx,jyfw,zzzs,rych,zycp,fwal,tjr,tjyj,xhyj,bz,gx)values
+  (#{cid},#{yhm,jdbcType=VARCHAR},#{dwmc,jdbcType=VARCHAR},#{frdb,jdbcType=VARCHAR},#{zcsj,jdbcType=VARCHAR},#{zczj,jdbcType=VARCHAR},#{lxdz,jdbcType=VARCHAR},#{yzbm,jdbcType=VARCHAR}
+  ,#{lxr,jdbcType=VARCHAR},#{lxdh,jdbcType=VARCHAR},#{sj,jdbcType=VARCHAR},#{yx,jdbcType=VARCHAR},#{jyfw,jdbcType=VARCHAR},#{zzzs,jdbcType=VARCHAR},#{rych,jdbcType=VARCHAR},#{zycp,jdbcType=VARCHAR}
+  ,#{fwal,jdbcType=VARCHAR},#{tjr,jdbcType=VARCHAR},#{tjyj,jdbcType=VARCHAR},#{xhyj,jdbcType=VARCHAR},#{bz,jdbcType=VARCHAR},#{gx,jdbcType=VARCHAR})
+  </insert>	
+  
+    <select id="countsqrh" parameterType="java.lang.String" resultType="int">
+		select count(*) from tjpcms_sqrh where yhm=#{yhm} 
+	</select>
+
+    <select id="getbqqyname" resultType="java.util.Map" parameterType="map">
+		SELECT * FROM tjpcms_bqqy WHERE cid=111 and shzt='审核通过' 
+	    <if test="year!=null and year!= '' and year!='全部' ">
+	        and (year=#{year})
+	   </if>
+	    <if test="pm!=null and pm!= '' ">
+	        and (pm=#{pm})
+	   </if>
+	    <if test="qymc!=null and qymc!= '' ">
+	        and (mc like '%${qymc}%')
+	   </if>
+		 order by year desc, px desc   limit #{s},#{e} 
+	</select>
+  
+    <select id="cntBqqylist" resultType="int" parameterType="map">
+		SELECT count(*) FROM tjpcms_bqqy WHERE cid=111 and shzt='审核通过' 
+	    <if test="year!=null and year!= '' and year!='全部' ">
+	        and (year=#{year})
+	   </if>
+	    <if test="pm!=null and pm!= '' ">
+	        and (pm=#{pm})
+	   </if>
+	    <if test="qymc!=null and qymc!= '' ">
+	        and (mc like '%${qymc}%')
+	   </if>
+	</select>
+	
+
+</mapper>
